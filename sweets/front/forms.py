@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms import BaseForm
 
-from sweets.posts.models import *
+from .models import *
 
 
 # Создаём класс формы
@@ -45,8 +45,7 @@ class RegistrForm(UserCreationForm):
         model = User
         # Свойство назначения полей
         fields = (
-            'username', 'email', 'age', 'gender', 'family_name', 'amount_members', 'abilities', 'desease', 'phobias',
-            'languages', 'vaccition', 'phone', 'password1', 'password2',)
+            'title','courier_type', 'regions','working_hours','user',)
 
     def save(self, commit=True):
         user = super().save(commit)

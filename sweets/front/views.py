@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 # Create your views here.
 
 
-from .models import *
+# from .models import *
 from .forms import RegistrForm
 from django.contrib import messages
 
