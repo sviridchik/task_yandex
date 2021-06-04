@@ -7,17 +7,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 # Create your views here.
 
-
 # from .models import *
 from .forms import RegistrForm
 from django.contrib import messages
 
-
 from django.shortcuts import render
+
 
 def login_form(request, form):
     user = form.get_user()
     login(request, user)
+
+
 # Create your views here.
 def signin(request):
     data = {}
@@ -41,7 +42,7 @@ def signin(request):
     else:
         form = AuthenticationForm()
         data['form'] = form
-    return render(request, 'auth.html', data)
+    return render(request, 'signin.html', data)
 
 
 def signup(request):
@@ -65,4 +66,4 @@ def signup(request):
     else:
         form = RegistrForm()
         data['form'] = form
-    return render(request, 'registr.html', data)
+    return render(request, 'signup.html', data)

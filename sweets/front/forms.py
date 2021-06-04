@@ -10,51 +10,66 @@ from django.forms import BaseForm
 from .models import *
 
 
-# Создаём класс формы
 class RegistrForm(UserCreationForm):
+    # username = forms.CharField(blank=True, max_length=150, unique=True, )
     courier_type_ch = (
         ('foot', 'foot'),
         ('bike', 'bike'),
         ('car', 'car'),
     )
-    # Добавляем новое поле Email
 
-    courier_type = forms.CharField(max_length=255,choices=courier_type_ch,blank=False)
-    regions = forms.CharField(max_length=255, blank=False)
-    working_hours = models.CharField(max_length=255, blank=False)
-    assign_time_current_for_delivery = models.DateTimeField(null=True)
+    gender_choce = (
+        ("definite", (("w", "woman"),
+                      ("m", "man"),
+                      )),
+        ("indefinite", (("t", "trans"),
+                        ("o", "other"),))
+    )
 
+    gender = forms.ChoiceField(choices=gender_choce, required=False)
+    first_name = forms.CharField(label='Имя', max_length=70, required=False)
+    last_name = forms.CharField(label='Фамилия', max_length=70, required=False)
+    courier_type = forms.ChoiceField(label='Тип курьера', choices=courier_type_ch, help_text='This field is required')
+    regions = forms.CharField(label='Регионы', max_length=255, help_text='This field is required')
+    working_hours = forms.CharField(label='Рабочие часы', max_length=255, help_text='This field is required')
+    email = forms.EmailField(label='Адрес E-mail', max_length=150, help_text='This field is required')
+    phone = forms.CharField(label='Мобильный телефон', max_length=28, required=False)
+    # password1 = forms.CharField(label='Пароль', max_length=128)
+    # password2 = forms.CharField(label='Подтверждение пароля', max_length=128)
+    age = forms.IntegerField(help_text='This field is required', min_value=0, max_value=120)
 
-    # def clean_age(self):
-    #     if self.cleaned_data['age'] < 18:
-    #         raise ValidationError('Нет 18 лет')
-    #     return self.cleaned_data['age']
-    #
-    # def clean_phone(self):
-    #     phone = self.cleaned_data['phone'].strip()
-    #
-    #     if (phone.startswith('+') and len(list(filter(lambda char: char.isdigit(), phone[1:]))) == len(
-    #             phone) - 1) or len(phone) == 0:
-    #         return self.cleaned_data['phone']
-    #     else:
-    #         raise ValidationError('Телефон в неправильном формате')
+    def clean_age(self):
+        if self.cleaned_data['age'] < 18:
+            raise ValidationError('Нет 18 лет')
+        return self.cleaned_data['age']
 
-    # Создаём класс Meta
+    def clean_phone(self):
+        phone = self.cleaned_data['phone'].strip()
+
+        if (phone.startswith('+') and len(list(filter(lambda char: char.isdigit(), phone[1:]))) == len(
+                phone) - 1) or len(phone) == 0:
+            return self.cleaned_data['phone']
+        else:
+            raise ValidationError('Телефон в неправильном формате')
+
     class Meta:
         # Свойство модели User
         model = User
         # Свойство назначения полей
         fields = (
-            'title','courier_type', 'regions','working_hours','user',)
+            'username', 'first_name', 'last_name', 'age', 'gender', 'email', 'phone', 'courier_type', 'regions',
+            'working_hours',
+            'password1', 'password2',)
 
     def save(self, commit=True):
         user = super().save(commit)
-        User.objects.create(
+        Person.objects.create(
             **{
-                'title': self.cleaned_data['title'],
-                'courier_type': self.cleaned_data['courier_type'],
-                'regions': self.cleaned_data['regions'],
-                'working_hours': self.cleaned_data['working_hours'],
+                'title': self.cleaned_data['username'],
+                'age': self.cleaned_data['age'],
+                'gender': self.cleaned_data['gender'],
+                'email': self.cleaned_data['email'],
+                'phone': self.cleaned_data['phone'],
                 'user': user
             })
 
