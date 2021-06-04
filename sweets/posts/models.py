@@ -23,7 +23,7 @@ class Orders(models.Model):
     weight = models.FloatField(blank=False)
     region = models.IntegerField(blank=False)
     delivery_hours = models.CharField(max_length=255, blank=False)
-    courier = models.ForeignKey(Couriers, on_delete=models.CASCADE, null=True)
+    courier = models.ForeignKey(Couriers, on_delete=models.CASCADE, null=True, blank=True)
     complete = models.BooleanField(default=False)
     complete_time = models.DateTimeField(null=True)
     assign_time = models.DateTimeField(null=True)

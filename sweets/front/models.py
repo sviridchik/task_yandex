@@ -4,6 +4,7 @@ from django.db import models
 # from django.contrib.contenttypes import *
 from django.db.models import CASCADE
 from django.contrib.auth.models import User
+from posts.models import Couriers
 
 
 class Person(models.Model):
@@ -20,3 +21,4 @@ class Person(models.Model):
     email = models.CharField(max_length=255, verbose_name="email", default='')
     phone = models.CharField(max_length=255, verbose_name="телефон", default='', blank=True)
     user = models.ForeignKey('auth.User', verbose_name='Пользователь', on_delete=models.CASCADE)
+    courier = models.OneToOneField(Couriers, verbose_name='Курьер', on_delete=models.CASCADE)

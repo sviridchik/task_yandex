@@ -1,10 +1,8 @@
-
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -16,7 +14,6 @@ SECRET_KEY = '3)@+@2d7bdl@qb3-#@6(z!tdt)5b7)r5=@cg)@vgg6+kgw7avd'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -62,7 +59,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sweets.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -72,7 +68,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -92,13 +87,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = r'Europe/Minsk'
 
 USE_I18N = True
 
@@ -106,8 +100,27 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static_dev'),
+)
+
+API_HOST = '127.0.0.1'
+API_PORT = '8000'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'avivasite007@gmail.com'
+EMAIL_HOST_PASSWORD = 'RbgzqTrwM'
+EMAIL_PORT = 587
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+log_level = 'WARNING'
+log_path = 'logs.log'

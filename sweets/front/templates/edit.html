@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+    Edit - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-9">
+            <form method="post">
+                <h4>Edit:</h4>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success btn-block">Edit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

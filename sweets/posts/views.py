@@ -125,7 +125,7 @@ def schedule(courier_node, order, order_time_format, courier_time_format, assign
                 return order.order_id
 
 
-def assign_service(courier_node, acceptable_orders, assign_time_data)->list:
+def assign_service(courier_node, acceptable_orders, assign_time_data) -> list:
     """link orders and couriers"""
     res = []
     courier_time = ast.literal_eval(courier_node.working_hours)
@@ -166,7 +166,7 @@ def assign(request):
     res = []
 
     try:
-        acceptable_orders = Orders.objects.filter(weight__lte=acceptable_weight,complete=False)
+        acceptable_orders = Orders.objects.filter(weight__lte=acceptable_weight, complete=False)
     except Exception:
 
         return Response({"orders": []}, status=status.HTTP_200_OK)

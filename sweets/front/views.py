@@ -1,17 +1,27 @@
+import logging
+import threading
 from sqlite3 import ProgrammingError
 
+import requests
 from django.contrib.auth import login, authenticate
+from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+import json
+
+from django.utils import timezone
+from sweets.settings import API_HOST, log_path, log_level, API_PORT
 # Create your views here.
 
 # from .models import *
-from .forms import RegistrForm
+from .forms import RegistrForm, EditForm
 from django.contrib import messages
 
 from django.shortcuts import render
+
+logging.basicConfig(filename=log_path, level=getattr(logging, log_level))
 
 
 def login_form(request, form):
@@ -49,15 +59,19 @@ def signup(request):
     data = {}
     if request.method == 'POST':
         form = RegistrForm(request.POST)
+        data['form'] = form
         if form.is_valid():
-            form.save()
-            user = authenticate(request, username=form.cleaned_data['username'],
-                                password=form.cleaned_data['password1'])
-            login(request, user)
-            messages.success(request, "success")
-            data['form'] = form
-            # data['res'] = "Всё прошло успешно"
-            return redirect('/home')
+            try:
+                form.save()
+            except (ValidationError, json.JSONDecodeError):
+                messages.error(request, 'Ошибка в Регионах или в Рабочих часах')
+            else:
+                user = authenticate(request, username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'])
+                login(request, user)
+                messages.success(request, "success")
+                # data['res'] = "Всё прошло успешно"
+                return redirect('/home')
         else:
             data['form'] = form
             messages.error(request, 'Ошибка регистрации')
@@ -67,3 +81,111 @@ def signup(request):
         form = RegistrForm()
         data['form'] = form
     return render(request, 'signup.html', data)
+
+
+def start(request):
+    return render(request, 'start.html', {'title': 'Start'})
+
+
+def home(request):
+    return render(request, 'home.html', {'title': 'Home'})
+
+
+def about(request):
+    return render(request, 'about.html', {'title': 'About'})
+
+
+def work(request):
+    if not hasattr(request.user, 'person_set'):
+        return redirect('signup')
+    else:
+        person = request.user.person_set.get()
+
+        if request.method == 'POST':
+            if 'get_new_orders' in request.GET:
+                resp = requests.post(f'http://{API_HOST}:{API_PORT}/posts/orders/assign', json={
+                    "courier_id": person.courier.courier_id
+                })
+
+                if not resp.ok:
+                    logging.warning(f'Ошибка назначения заказов клиента {person}: {resp.text}')
+                    logging.error(resp.text)
+                    return redirect('work')
+
+                result = resp.json()['orders']
+                if len(result) == 0:
+                    messages.warning(request, 'Для Вас подходящих заказов пока нет')
+                else:
+                    res = " ".join(map(str, result)).replace('\'', '')
+                    messages.success(request, f'ID новых заказов: {res}')
+                    logging.error(f'ID новых заказов: {res}')
+
+            if 'complete_order' in request.GET:
+                resp = requests.post(f'http://{API_HOST}:{API_PORT}/posts/orders/complete', json={
+                    "courier_id": person.courier.courier_id,
+                    "order_id": request.GET['complete_order'],
+                    "complete_time": str(timezone.localtime().strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                })
+                if not resp.ok:
+
+                    logging.warning(f'Ошибка завершения заказа клиента {person}: {resp.text}')
+                    return redirect('work')
+                else:
+                    res = resp.text.replace('\"', '')
+                    messages.success(request, res)
+
+    resp = requests.get(f'http://{API_HOST}:{API_PORT}/posts/couriers/{person.courier.courier_id}')
+    if not resp.ok:
+        logging.warning(f'Ошибка получения курьера клиентом {person}: {resp.text}')
+        return redirect('register')
+    else:
+        context = resp.json()
+        context['person'] = request.user.person_set.get()
+        context['active_orders'] = person.courier.orders_set.filter(complete=False)
+        return render(request, 'work.html', context)
+
+
+def edit(request):
+    current_courier = request.user.person_set.get().courier
+    if request.method == 'POST':
+        form = EditForm(data=request.POST)
+        if form.is_valid():
+            try:
+                resp = requests.patch(f'http://{API_HOST}:{API_PORT}/posts/couriers/{current_courier.courier_id}',
+                                      json={
+                                          "courier_type": request.POST['courier_type'],
+                                          "regions": json.loads(request.POST['regions']),
+                                          "working_hours": json.loads(request.POST['working_hours'])
+                                      })
+            except json.JSONDecodeError:
+                messages.error(request, 'Введите правильный JSON формат')
+                return render(request, 'edit.html', {'form': form})
+
+            if resp.ok:
+                messages.success(request, f'Профиль успешно отредактирован')
+                return redirect('work')
+            else:
+                messages.error(request, resp.text)
+                return render(request, 'edit.html', {'form': form})
+        else:
+            messages.error(request, 'Некоторые данные введены неверно')
+    else:
+        form = EditForm(
+            data={'courier_type': str(current_courier.courier_type), 'regions': str(current_courier.regions),
+                  'working_hours': str(current_courier.working_hours).replace("'", '"')})
+    return render(request, 'edit.html', {'form': form})
+
+
+def contacts(request):
+    if request.method == 'POST':
+        thread = threading.Thread(target=send_mail, args=[
+            f'Вопрос от клиента {request.POST["name"]}',
+            f'''Почта клиента: {request.POST["email"]}
+Вопрос клиента: {request.POST["message"]} ''',
+            'avivasite007@gmail.com',
+            ['viccisviri@gmail.com']],
+                                  kwargs={'fail_silently': False})
+        thread.start()
+        messages.success(request, 'Ваше письмо отправлено, ожидайте ответа')
+
+    return render(request, 'contacts.html')

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block head_content %}
+    <meta name="theme-color" content="#7952b3">
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        body {
+            background-image: url('media/1.jpg');
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
+
+        .mt-5 mb-3 text-muted {
+
+            position: fixed;
+            top: 800px;
+            left: 100px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="main-body">
+
+        <!-- /Breadcrumb -->
+
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            {% if person.gender == 'w' %}
+                                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="Admin"
+                                     class="rounded-circle" width="150">
+                            {% else %}
+                                <img src="https://bootdey.com/img/Content/avatar/avatar4.png" alt="Admin"
+                                     class="rounded-circle" width="150">
+                            {% endif %}
+                            <div class="mt-3">
+                                <h4>{{ person.title }}</h4>
+                                <div class="row pb-4">
+                                    {% if rating %}
+                                        <div class="col">
+                                            <p>rating</p>
+                                            <p class="text-secondary mb-1">{{ rating }}</p>
+                                        </div>
+                                    {% endif %}
+                                    {% if earnings %}
+                                        <div class="col">
+                                            <p>earning</p>
+                                            <p class="text-secondary mb-1">{{ earnings }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="row pb-4">
+                                    {% if person.courier.assign_time_current_for_delivery %}
+                                        <div class="col">
+                                            <p>Текущее время назначения заказов</p>
+                                            <p class="text-secondary mb-1">{{ person.courier.assign_time_current_for_delivery }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="row">
+                                    <form action="?get_new_orders" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-block">Получить новые
+                                            заказы
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Full Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ person.user.last_name }} {{ person.user.first_name }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ person.email }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Courier type</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ courier_type }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Phone</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ person.phone }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Age</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ person.age }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Gender</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ person.gender }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Regions</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ regions }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Working hours</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ working_hours }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <a class="btn btn-info " href="{% url 'edit' %}">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <br>
+        <div class="row gutters-sm">
+            {% if active_orders %}
+                <h4>Список активных заказов</h4>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID заказа</th>
+                        <th scope="col">Вес (кг)</th>
+                        <th scope="col">Регион</th>
+                        <th scope="col">Часы доставки</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for order in active_orders %}
+                        <tr>
+                            <th scope="row">{{ order.order_id }}</th>
+                            <th scope="row">{{ order.weight }}</th>
+                            <th scope="row">{{ order.region }}</th>
+                            <th scope="row">{{ order.delivery_hours }}</th>
+                            <td>
+                                <form action="?complete_order={{ order.order_id }}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-block">Завершить</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <h4>Нет активных заказов</h4>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}

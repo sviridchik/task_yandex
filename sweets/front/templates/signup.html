@@ -3,8 +3,7 @@
     SignUp - {{ block.super }}
 {% endblock %}
 
-
-{% block content %}
+{% block head_content %}
     <meta name="theme-color" content="#7952b3">
 
 
@@ -37,6 +36,10 @@
         }
 
     </style>
+{% endblock %}
+
+{% block content %}
+
     <div class="row">
         <div class="col-lg-9">
             <h4>SignUp</h4>
@@ -47,5 +50,6 @@
             </form>
 
         </div>
+        <a class="nav-link" style="font:italic 50px bold" href="/signin">sign in</a>
     </div>
 {% endblock %}
