@@ -1,0 +1,17 @@
+<div id="snackbar"></div>
+<script>
+    function show_snack(text, cls) {
+        // Get the snackbar DIV
+        {#alert(text)#}
+        var x = document.getElementById("snackbar");
+        x.textContent = text
+        // Add the "show" class to DIV
+        x.className = cls + " show";
+
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function () {
+            {#x.className = x.className.replace("show", "");#}
+            x.className = ""
+        }, 3000);
+    }
+</script>

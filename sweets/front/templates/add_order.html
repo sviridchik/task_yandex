@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+    Add order - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-9">
+            <form method="post">
+                <h4>Add order:</h4>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success btn-block">Add order</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

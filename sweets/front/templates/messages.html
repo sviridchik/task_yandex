@@ -1,0 +1,22 @@
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            {#   <button onclick="show_snack('abra')">Show Snackbar</button>#}
+            <script>jQuery(document).ready(function () {
+                show_snack('{{ message }}', 'btn-danger');
+            });</script>
+        {% elif message.tags == 'success' %}
+            <script>jQuery(document).ready(function () {
+                show_snack('{{ message }}', 'btn-success');
+            });</script>
+        {% elif message.tags == 'warning' %}
+            <script>jQuery(document).ready(function () {
+                show_snack('{{ message }}', 'btn-warning');
+            });</script>
+        {% else %}
+            <script>jQuery(document).ready(function () {
+                show_snack('{{ message }}', 'btn-primary');
+            });</script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
