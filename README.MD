@@ -16,7 +16,7 @@ if you want to run tests
 
 
 2) Description
-- python REST API service , that allows hire couriers, get orders, and destribute orders between them,calculate their salary and rating added frontend
+- python REST API service , that allows hire couriers, get orders, and destribute orders between them,calculate their salary and rating , added frontend
 
 3) Notes
 
