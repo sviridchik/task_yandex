@@ -3,6 +3,11 @@
     <nav class="my-2 my-md-0 mr-md-3">
         <a class="p-2 text-dark" href="/home">Домашняя страница</a>
         <a class="p-2 text-dark" href="/contacts">Контакты</a>
+        {% if request.user.is_staff %}
+            <a class="p-2 text-dark"
+               href="{% url 'add_order' %}">Добавить заказ
+            </a>
+        {% endif %}
         <a class="p-2 text-dark">{{ request.user }}</a>
     </nav>
 </div>

@@ -35,7 +35,8 @@ class CouriersView(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 def couriers_list(request):
-    check_creditnails(request)
+    if 'user_id' in request.data:
+        check_creditnails(request)
     flag_valid = True
     res = {}
     error = {}
@@ -75,7 +76,9 @@ class OrdersView(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 def order_list(request):
-    check_creditnails(request)
+    if 'user_id' in request.data:
+        check_creditnails(request)
+
     flag_valid = True
     res = {}
     error = {}

@@ -1,6 +1,9 @@
+from django.contrib.auth.models import User
 from django.test import Client
 from django.test import TestCase
-from .models import Orders,Couriers
+from .models import Orders, Couriers
+from rest_framework.authtoken.models import Token
+
 # Create your tests here.
 
 courier_data = {
@@ -49,18 +52,17 @@ data_complete_cour = {
         }
     ]
 }
-data_complete_order={
-"courier_id": 1,
-"order_id": 1,
-"complete_time": "2021-01-10T10:33:01.42Z"
+data_complete_order = {
+    "courier_id": 1,
+    "order_id": 1,
+    "complete_time": "2021-01-10T10:33:01.42Z"
 }
 
-data_complete_order_invalid={
-"courier_id": 2,
-"order_id": 1,
-"complete_time": "2021-01-10T10:33:01.42Z"
+data_complete_order_invalid = {
+    "courier_id": 2,
+    "order_id": 1,
+    "complete_time": "2021-01-10T10:33:01.42Z"
 }
-
 
 courier_data_invalid_field_val = {
     "data": [
@@ -107,34 +109,34 @@ courier_data_patch = {
 }
 data_patch = {"courier_type": "car"}
 data_patch_invalid = {"blabla": [22]}
-data_patch_invalid_2 = {"courier_type"}
-data_assign ={
-"courier_id": 1
+data_patch_invalid_2 = {"courier_type": 'x'}
+data_assign = {
+    "courier_id": 1
 }
 
-data_assign_2 ={
-"courier_id": 123
+data_assign_2 = {
+    "courier_id": 123
 }
 data_complete = {
-"courier_id": 1,
-"order_id": 1,
-"complete_time": "2021-01-10T10:33:01.42Z"
+    "courier_id": 1,
+    "order_id": 1,
+    "complete_time": "2021-01-10T10:33:01.42Z"
 }
 
 data_complete_invalid = {
-"courier_id": 2,
-"order_id": 1,
-"complete_time": "2021-01-10T10:33:01.42Z"
+    "courier_id": 2,
+    "order_id": 1,
+    "complete_time": "2021-01-10T10:33:01.42Z"
 }
 data_complete_invalid_2 = {
-"courier_id": 2,
-"order_id": 98,
-"complete_time": "2021-01-10T10:33:01.42Z"
+    "courier_id": 2,
+    "order_id": 98,
+    "complete_time": "2021-01-10T10:33:01.42Z"
 }
 data_complete_invalid_3 = {
-"courier_id": 1,
-"order_id": 198,
-"complete_time": "2021-01-10T10:33:01.42Z"
+    "courier_id": 1,
+    "order_id": 198,
+    "complete_time": "2021-01-10T10:33:01.42Z"
 }
 
 order_data = {
@@ -160,7 +162,6 @@ order_data = {
     ]
 }
 
-
 order_data_add = {
     "data": [
         {
@@ -169,7 +170,6 @@ order_data_add = {
             "region": 12,
             "delivery_hours": ["09:00-18:00"]
         }]}
-
 
 order_data_invalid_field_val = {
     "data": [
@@ -198,105 +198,162 @@ order_data_field_mistake = {
 
 
 class CourierTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.user = User.objects.create(username='test1', password='test1')
+        cls.token, created = Token.objects.get_or_create(user=cls.user)
+        super().setUpClass()
+
     def test_create(self):
         c = Client()
-        response = c.post('/couriers', courier_data, content_type='application/json')
+        response = c.post('/posts/couriers', dict(courier_data, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
     def test_create_invalid(self):
         c = Client()
-        response_not_valid_repid = c.post('/couriers', courier_data_invalid_field_val, content_type='application/json')
+        response_not_valid_repid = c.post('/posts/couriers', dict(courier_data_invalid_field_val, user_id=self.user.id,
+                                                                  token=self.token.key),
+                                          content_type='application/json')
         self.assertEqual(response_not_valid_repid.status_code, 400)
-        response_not_valid = c.post('/couriers', courier_data_field_mistake, content_type='application/json')
+        response_not_valid = c.post('/posts/couriers',
+                                    dict(courier_data_field_mistake, user_id=self.user.id, token=self.token.key),
+                                    content_type='application/json')
         self.assertEqual(response_not_valid.status_code, 400)
 
     def test_patch(self):
         c = Client()
-        response_patch_create = c.post('/couriers', courier_data_patch, content_type='application/json')
+        response_patch_create = c.post('/posts/couriers',
+                                       dict(courier_data_patch, user_id=self.user.id, token=self.token.key),
+                                       content_type='application/json')
         self.assertEqual(response_patch_create.status_code, 201)
-        response_patch = c.patch('/couriers/1', data_patch, content_type='application/json')
+        response_patch = c.patch('/posts/couriers/1', dict(data_patch, user_id=self.user.id, token=self.token.key),
+                                 content_type='application/json')
         self.assertEqual(response_patch.status_code, 200)
 
     def test_patch_invalid(self):
         c = Client()
-        response_patch_create = c.post('/couriers', courier_data_patch, content_type='application/json')
+        response_patch_create = c.post('/posts/couriers',
+                                       dict(courier_data_patch, user_id=self.user.id, token=self.token.key),
+                                       content_type='application/json')
         self.assertEqual(response_patch_create.status_code, 201)
-        response_patch_invalid = c.patch('/couriers/1', data_patch_invalid, content_type='application/json')
+        response_patch_invalid = c.patch('/posts/couriers/1',
+                                         dict(data_patch_invalid, user_id=self.user.id, token=self.token.key),
+                                         content_type='application/json')
         self.assertEqual(response_patch_invalid.status_code, 400)
-        response_patch_invalid = c.patch('/couriers/1', data_patch_invalid_2, content_type='application/json')
+        response_patch_invalid = c.patch('/posts/couriers/1',
+                                         dict(data_patch_invalid_2, user_id=self.user.id, token=self.token.key),
+                                         content_type='application/json')
         self.assertEqual(response_patch_invalid.status_code, 400)
 
 
 class OrderTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.user = User.objects.create(username='test2', password='test2')
+        cls.token, created = Token.objects.get_or_create(user=cls.user)
+        super().setUpClass()
+
     def test_create(self):
         c = Client()
-        response = c.post('/orders', order_data, content_type='application/json')
+        response = c.post('/posts/orders', dict(order_data, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
     def test_create_invalid(self):
         c = Client()
-        response_not_valid = c.post('/orders', order_data_invalid_field_val, content_type='application/json')
+        response_not_valid = c.post('/posts/orders',
+                                    dict(order_data_invalid_field_val, user_id=self.user.id, token=self.token.key),
+                                    content_type='application/json')
         self.assertEqual(response_not_valid.status_code, 400)
-        response_not_valid = c.post('/orders', order_data_field_mistake, content_type='application/json')
+        response_not_valid = c.post('/posts/orders',
+                                    dict(order_data_field_mistake, user_id=self.user.id, token=self.token.key),
+                                    content_type='application/json')
         self.assertEqual(response_not_valid.status_code, 400)
 
     def test_assign(self):
         c = Client()
-        response_patch_create = c.post('/couriers', courier_data_patch, content_type='application/json')
+        response_patch_create = c.post('/posts/couriers',
+                                       dict(courier_data_patch, user_id=self.user.id, token=self.token.key),
+                                       content_type='application/json')
         self.assertEqual(response_patch_create.status_code, 201)
-        response = c.post('/orders', order_data, content_type='application/json')
+        response = c.post('/posts/orders', dict(order_data, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        response = c.post('/orders/assign', data_assign, content_type='application/json')
+        response = c.post('/posts/orders/assign', dict(data_assign, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response,'"orders":[{"id":1},{"id":3}]')
-
+        self.assertContains(response, '"orders":[{"id":1},{"id":3}]')
 
     def test_assign_invalid(self):
         c = Client()
-        response = c.post('/orders/assign', data_assign_2, content_type='application/json')
+        response = c.post('/posts/orders/assign', dict(data_assign_2, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
+
 class CompleteTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.user = User.objects.create(username='test3', password='test3')
+        cls.token, created = Token.objects.get_or_create(user=cls.user)
+        super().setUpClass()
+
     def setUp(self) -> None:
         c = Client()
-        response_patch_create = c.post('/couriers', data_complete_cour, content_type='application/json')
+        response_patch_create = c.post('/posts/couriers',
+                                       dict(data_complete_cour, user_id=self.user.id, token=self.token.key),
+                                       content_type='application/json')
         self.assertEqual(response_patch_create.status_code, 201)
-        response = c.post('/orders', order_data, content_type='application/json')
+        response = c.post('/posts/orders', dict(order_data, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        response = c.post('/orders/assign', data_assign, content_type='application/json')
+        response = c.post('/posts/orders/assign', dict(data_assign, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 200)
-
-
 
     def test_complete(self):
         c = Client()
-        response = c.post('/orders/complete', data_complete, content_type='application/json')
+        response = c.post('/posts/orders/complete', dict(data_complete, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response,'{"order_id":1}')
+        self.assertContains(response, '{"order_id":1}')
 
-        self.assertEqual(Orders.objects.get(pk = 1).complete,True)
+        self.assertEqual(Orders.objects.get(pk=1).complete, True)
 
     def test_assign_time(self):
         c = Client()
-        response = c.post('/orders/complete', data_complete, content_type='application/json')
+        response = c.post('/posts/orders/complete', dict(data_complete, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '{"order_id":1}')
 
         self.assertEqual(Orders.objects.get(pk=1).complete, True)
         old_assign_time = Orders.objects.get(pk=1).assign_time
-        response = c.post('/orders', order_data_add, content_type='application/json')
+        response = c.post('/posts/orders', dict(order_data_add, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        response = c.post('/orders/assign', data_assign, content_type='application/json')
+        response = c.post('/posts/orders/assign', dict(data_assign, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(Orders.objects.get(pk=123).assign_time,old_assign_time)
-
+        self.assertNotEqual(Orders.objects.get(pk=123).assign_time, old_assign_time)
 
     def test_complete_invalid(self):
         c = Client()
-        response = c.post('/orders/complete', data_complete_invalid, content_type='application/json')
+        response = c.post('/posts/orders/complete',
+                          dict(data_complete_invalid, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        response = c.post('/orders/complete', data_complete_invalid_2, content_type='application/json')
+        response = c.post('/posts/orders/complete',
+                          dict(data_complete_invalid_2, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        response = c.post('/orders/complete', data_complete_invalid_3, content_type='application/json')
+        response = c.post('/posts/orders/complete',
+                          dict(data_complete_invalid_3, user_id=self.user.id, token=self.token.key),
+                          content_type='application/json')
         self.assertEqual(response.status_code, 400)
+
+    # @classmethod
+    # def tearDownClass(cls):
+    #     pass

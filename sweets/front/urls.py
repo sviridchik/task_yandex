@@ -19,11 +19,11 @@ urlpatterns = [
     path('work', work, name='work'),
     path('edit', edit, name='edit'),
     path('contacts', contacts),
-    path('add_order', add_order),
+    path('add_order', add_order, name='add_order'),
     # path('orders/$<int:pk>', views.assign),
     # path('couriers', views.CourierView)
 ]
 
-# if settings.DEBUG:
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

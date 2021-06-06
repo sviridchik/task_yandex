@@ -25,11 +25,6 @@ from django.shortcuts import render
 logging.basicConfig(filename=log_path, level=getattr(logging, log_level))
 
 
-def login_form(request, form):
-    user = form.get_user()
-    login(request, user)
-
-
 # Create your views here.
 def signin(request):
     data = {}
@@ -64,7 +59,7 @@ def signup(request):
         if form.is_valid():
             try:
                 form.save()
-            except (ValidationError, json.JSONDecodeError):
+            except (ValidationError, json.JSONDecodeError) as e:
                 messages.error(request, 'Ошибка в Регионах или в Рабочих часах')
             else:
                 user = authenticate(request, username=form.cleaned_data['username'],
