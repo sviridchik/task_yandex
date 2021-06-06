@@ -8,7 +8,10 @@ if you want to run server
 -  docker-compose up 
 
 if you want to run tests
-- python3 manage.py test
+- coverage run --source='.' manage.py test front posts
+
+- coverage report
+
 
 
 
