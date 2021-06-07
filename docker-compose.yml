@@ -10,7 +10,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   web:
-    build: .
+    image: vikusha007/4term_isp34
     command: bash -c "
       sleep 5 &&
       python sweets/manage.py migrate &&

@@ -7,6 +7,9 @@ if you want to run server
  <br>or
 -  docker-compose up 
 
+Dockerhub:
+**https://hub.docker.com/repository/docker/vikusha007/4term_isp34/general
+
 if you want to run tests
 - coverage run --source='.' manage.py test front posts
 
@@ -16,7 +19,7 @@ if you want to run tests
 
 
 2) Description
-- python REST API service , that allows hire couriers, get orders, and destribute orders between them,calculate their salary and rating , added frontend
+- python REST API service , that allows hire couriers, get orders, and distribute orders between them,calculate their salary and rating , added frontend
 
 3) Notes
 
