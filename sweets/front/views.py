@@ -32,7 +32,8 @@ def signin(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             # form.save()
-            login_form(request, form)
+            user = form.get_user()
+            login(request, user)
             # user = form.get_user()
             # login(request, user)
             messages.success(request, "success")
