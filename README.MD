@@ -25,4 +25,20 @@ if you want to run tests
 
 - to add order sign-in as admin (create first) 
 
+4) Added basic info especially for Vitaly Sergeevich<br>
+<STRONG>!!!!!!!!!!!!!!!!!!!!!ATTENTION!!!!!!!!!!!!!!!!!!!!!!</STRONG><br>
+
+
+AS COURIER (REGULAR USER):<br>
+ButomaUser<br>
+zaqwsx1234<br>
+
+AS SUPER USER:<br>
+butoma <br>
+1234<br>
+
+SOME ORDERS ARE ALREADY IN DB<br>
+
+
+any whim for your credit<br>
 © designed with love by VictoriaSviridchik
